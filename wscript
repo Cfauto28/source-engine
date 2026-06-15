@@ -7,7 +7,7 @@ from waflib import Logs, Context, Configure
 import sys
 import os
 
-VERSION = '1.0'
+VERSION = '1.17'
 APPNAME = 'source-engine'
 top = '.'
 
@@ -66,7 +66,7 @@ projects={
 		'launcher',
 		'launcher_main',
 		'materialsystem',
-#		'materialsystem/shaderapiempty',
+		'materialsystem/shaderapiempty',
 		'materialsystem/shaderapidx9',
 		'materialsystem/shaderlib',
 		'materialsystem/stdshaders',
@@ -305,8 +305,8 @@ def options(opt):
 	grp.add_option('--use-togl', action = 'store', dest = 'GL', type = 'int', default = sys.platform != 'win32',
 		help = 'build engine with ToGL [default: %default]')
 
-	grp.add_option('--build-games', action = 'store', dest = 'GAMES', type = 'string', default = 'hl2',
-		help = 'build games [default: %default]')
+	grp.add_option('--game', action = 'store', dest = 'GAMES', type = 'string', default = 'hl2',
+		help = 'build game [default: %default]')
 
 	grp.add_option('--use-ccache', action = 'store_true', dest = 'CCACHE', default = False,
 		help = 'build using ccache [default: %default]')

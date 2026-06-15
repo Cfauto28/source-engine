@@ -1,4 +1,4 @@
-name: Build
+name: Build Half-Life 2
 
 on: [push, pull_request]
 env:

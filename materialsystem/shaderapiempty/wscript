@@ -18,6 +18,10 @@ def configure(conf):
 	])
 
 def build(bld):
+
+	if bld.env.DEST_OS == 'android':
+		return
+
 	source = [
 		'shaderapiempty.cpp',
 		'../../public/tier0/memoverride.cpp'
