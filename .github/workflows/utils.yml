@@ -5,7 +5,7 @@ env:
   WAF_FLAGS: -T release --disable-warns --prefix=build_utils --utils
 
 jobs:
-  tests-linux:
+  utils-linux:
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -52,12 +52,15 @@ jobs:
           path: |
             build_utils/**/*.debug
 
-  tests-macos:
+  utils-macos:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Install dependencies
+        run: brew install sdl2
 
       - name: Configure
         run: ./waf configure $WAF_FLAGS
@@ -77,7 +80,7 @@ jobs:
           path: |
             build_utils/**/*.dSYM
 
-  tests-windows:
+  utils-windows:
     strategy:
       matrix:
         os: [windows-2022]
