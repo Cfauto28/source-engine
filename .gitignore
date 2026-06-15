@@ -26,11 +26,13 @@ Release_*/
 *.dll*
 *.exp
 *.ilk
+*.so
 ValveETWProviderEvents.h
 game/client/*/client.lib
 game/server/*/server.lib
 .DS_Store
 build*/
+install/
 .cache/
 .ccache/
 waf3*/
