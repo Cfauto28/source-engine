@@ -14,6 +14,7 @@
 */
 
 #include "cbase.h"
+#include "convar.h"
 #include "portal_player.h"
 #include "portal_gamerules.h"
 #include "gamerules.h"
@@ -30,6 +31,8 @@
 #include "tier0/memdbgon.h"
 
 void Host_Say( edict_t *pEdict, bool teamonly );
+
+ConVar sv_use_portal_gamerules("sv_use_portal_gamerules", "0", FCVAR_REPLICATED | FCVAR_ARCHIVE | FCVAR_NOT_CONNECTED);
 
 extern CBaseEntity*	FindPickerEntityClass( CBasePlayer *pPlayer, char *classname );
 extern bool			g_fGameOver;
@@ -119,11 +122,11 @@ void ClientGamePrecache( void )
 	CBaseEntity::PrecacheModel( "models/portals/portal2.mdl" );
 }
 
-
+ConVar sv_respawn_in_sp( "sv_respawn_in_sp", "0" );
 // called by ClientKill and DeadThink
 void respawn( CBaseEntity *pEdict, bool fCopyCorpse )
 {
-	if (gpGlobals->coop || gpGlobals->deathmatch)
+	if (sv_respawn_in_sp.GetBool() || gpGlobals->coop || gpGlobals->deathmatch)
 	{
 		if ( fCopyCorpse )
 		{
@@ -154,23 +157,12 @@ void GameStartFrame( void )
 //=========================================================
 void InstallGameRules()
 {
-	if ( !gpGlobals->deathmatch )
+	if (sv_use_portal_gamerules.GetBool())
 	{
-		CreateGameRulesObject( "CPortalGameRules" );
-		return;
+		CreateGameRulesObject("CPortalGameRules");
 	}
 	else
 	{
-		if ( teamplay.GetInt() > 0 )
-		{
-			// teamplay
-			CreateGameRulesObject( "CTeamplayRules" );
-		}
-		else
-		{
-			// vanilla deathmatch
-			CreateGameRulesObject( "CMultiplayRules" );
-		}
+		CreateGameRulesObject("CHalfLife2");
 	}
 }
-

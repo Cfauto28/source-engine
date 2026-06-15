@@ -35,14 +35,13 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-
-#define MINIMUM_FLOOR_PORTAL_EXIT_VELOCITY 50.0f
-#define MINIMUM_FLOOR_TO_FLOOR_PORTAL_EXIT_VELOCITY 225.0f
-#define MINIMUM_FLOOR_PORTAL_EXIT_VELOCITY_PLAYER 300.0f
-#define MAXIMUM_PORTAL_EXIT_VELOCITY 1000.0f
-
 CCallQueue *GetPortalCallQueue();
 
+
+ConVar sv_portal_minimum_floor_exit_velocity("sv_portal_minimum_floor_exit_velocity", "50.0", FCVAR_REPLICATED );
+ConVar sv_portal_minimum_floor_to_floor_exit_velocity("sv_portal_minimum_floor_to_floor_exit_velocity", "225.0", FCVAR_REPLICATED );
+ConVar sv_portal_minimum_floor_exit_velocity_player("sv_portal_minimum_floor_exit_velocity_player", "300.0", FCVAR_REPLICATED );
+ConVar sv_portal_maximum_exit_velocity("sv_portal_maximum_exit_velocity", "1000.0", FCVAR_REPLICATED );
 
 ConVar sv_portal_debug_touch("sv_portal_debug_touch", "0", FCVAR_REPLICATED );
 ConVar sv_portal_placement_never_fail("sv_portal_placement_never_fail", "0", FCVAR_REPLICATED | FCVAR_CHEAT );
@@ -1133,27 +1132,27 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 		{
 			if ( bPlayer )
 			{
-				if( vNewVelocity.z < MINIMUM_FLOOR_PORTAL_EXIT_VELOCITY_PLAYER ) 
-					vNewVelocity.z = MINIMUM_FLOOR_PORTAL_EXIT_VELOCITY_PLAYER;
+				if( vNewVelocity.z < sv_portal_minimum_floor_exit_velocity_player.GetFloat() ) 
+					vNewVelocity.z = sv_portal_minimum_floor_exit_velocity_player.GetFloat();
 			}
 			else
 			{
 				if( LocalPortalDataAccess.Placement.vForward.z > 0.7071f )
 				{
-					if( vNewVelocity.z < MINIMUM_FLOOR_TO_FLOOR_PORTAL_EXIT_VELOCITY ) 
-						vNewVelocity.z = MINIMUM_FLOOR_TO_FLOOR_PORTAL_EXIT_VELOCITY;
+					if( vNewVelocity.z < sv_portal_minimum_floor_to_floor_exit_velocity.GetFloat() ) 
+						vNewVelocity.z = sv_portal_minimum_floor_to_floor_exit_velocity.GetFloat();
 				}
 				else
 				{
-					if( vNewVelocity.z < MINIMUM_FLOOR_PORTAL_EXIT_VELOCITY )
-						vNewVelocity.z = MINIMUM_FLOOR_PORTAL_EXIT_VELOCITY;
+					if( vNewVelocity.z < sv_portal_minimum_floor_exit_velocity.GetFloat() )
+						vNewVelocity.z = sv_portal_minimum_floor_exit_velocity.GetFloat();
 				}
 			}
 		}
 
 
-		if ( vNewVelocity.LengthSqr() > (MAXIMUM_PORTAL_EXIT_VELOCITY * MAXIMUM_PORTAL_EXIT_VELOCITY)  )
-			vNewVelocity *= (MAXIMUM_PORTAL_EXIT_VELOCITY / vNewVelocity.Length());
+		if ( vNewVelocity.LengthSqr() > (sv_portal_maximum_exit_velocity.GetFloat() * sv_portal_maximum_exit_velocity.GetFloat())  )
+			vNewVelocity *= (sv_portal_maximum_exit_velocity.GetFloat() / vNewVelocity.Length());
 	}
 
 	//untouch the portal(s), will force a touch on destination after the teleport
@@ -1371,7 +1370,7 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 						DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
 						Fizzle();
 					}
-					else if ( tr.m_pEnt && tr.m_pEnt->IsMoving() )
+					else if ( !sv_allow_mobile_portals.GetBool() && tr.m_pEnt && tr.m_pEnt->IsMoving() )
 					{
 						DevMsg( "Surface behind portal is moving.\n" );
 
@@ -1827,7 +1826,7 @@ void CProp_Portal::UpdatePortalTeleportMatrix( void )
 	}
 }
 
-void CProp_Portal::UpdatePortalLinkage( void )
+bool CProp_Portal::UpdatePortalLinkage( void )
 {
 	if( m_bActivated )
 	{
@@ -1965,7 +1964,10 @@ void CProp_Portal::UpdatePortalLinkage( void )
 
 		Vector ptCenter = GetAbsOrigin();
 		QAngle qAngles = GetAbsAngles();
-		m_PortalSimulator.MoveTo( ptCenter, qAngles );
+		if (!m_PortalSimulator.MoveTo(ptCenter, qAngles)) 
+		{
+			return false;
+		}
 
 		if( pLink )
 			m_PortalSimulator.AttachTo( &pLink->m_PortalSimulator );
@@ -1984,6 +1986,8 @@ void CProp_Portal::UpdatePortalLinkage( void )
 		if( pRemote )
 			pRemote->UpdatePortalLinkage();
 	}
+
+	return true;
 }
 
 void CProp_Portal::PlacePortal( const Vector &vOrigin, const QAngle &qAngles, float fPlacementSuccess, bool bDelay /*= false*/ )
@@ -2059,7 +2063,7 @@ void CProp_Portal::PlacePortal( const Vector &vOrigin, const QAngle &qAngles, fl
 	}	
 }
 
-void CProp_Portal::NewLocation( const Vector &vOrigin, const QAngle &qAngles )
+void CProp_Portal::NewLocation( const Vector &vOrigin, const QAngle &qAngles, const bool isFailReplace )
 {
 	// Tell our physics environment to stop simulating it's entities.
 	// Fast moving objects can pass through the hole this frame while it's in the old location.
@@ -2070,6 +2074,9 @@ void CProp_Portal::NewLocation( const Vector &vOrigin, const QAngle &qAngles )
 	m_vPrevForward = vOldForward;
 
 	WakeNearbyEntities();
+
+	Vector prevPos = GetAbsOrigin();
+	QAngle prevRot = GetAbsAngles();
 
 	Teleport( &vOrigin, &qAngles, 0 );
 
@@ -2097,17 +2104,42 @@ void CProp_Portal::NewLocation( const Vector &vOrigin, const QAngle &qAngles )
 		controller.SoundChangeVolume( m_pAmbientSound, 0.4, 0.1 );
 	}
 
-	DispatchParticleEffect( ( ( m_bIsPortal2 ) ? ( "portal_2_particles" ) : ( "portal_1_particles" ) ), PATTACH_POINT_FOLLOW, this, "particles_2", true );
-	DispatchParticleEffect( ( ( m_bIsPortal2 ) ? ( "portal_2_edge" ) : ( "portal_1_edge" ) ), PATTACH_POINT_FOLLOW, this, "particlespin" );
+	if (!isFailReplace) 
+	{
+		DispatchParticleEffect(((m_bIsPortal2) ? ("portal_2_particles") : ("portal_1_particles")), PATTACH_POINT_FOLLOW, this, "particles_2", true);
+		DispatchParticleEffect(((m_bIsPortal2) ? ("portal_2_edge") : ("portal_1_edge")), PATTACH_POINT_FOLLOW, this, "particlespin");
+	}
 
 	//if the other portal should be static, let's not punch stuff resting on it
 	bool bOtherShouldBeStatic = false;
 	if( !m_hLinkedPortal )
 		bOtherShouldBeStatic = true;
 
+	bool prevActivated = m_bActivated;
+
 	m_bActivated = true;
 
-	UpdatePortalLinkage();
+	if (!UpdatePortalLinkage())
+	{
+		Assert(!isFailReplace);
+		DoFizzleEffect(PORTAL_FIZZLE_CANT_FIT, false);
+		if (isFailReplace)  // is is already failed, it should be ok to place on the prev position. But failed again, so only can Fizzle it.
+		{
+			Fizzle();
+		}
+		else 
+		{
+			if (prevActivated)
+			{
+				NewLocation(prevPos, prevRot, true);
+			}
+			else 
+			{
+				Fizzle();
+			}
+		}
+		return;
+	}
 	UpdatePortalTeleportMatrix();
 
 	// Update the four corners of this portal for faster reference
@@ -2124,13 +2156,16 @@ void CProp_Portal::NewLocation( const Vector &vOrigin, const QAngle &qAngles )
 		}
 	}
 
-	if ( m_bIsPortal2 )
+	if (!isFailReplace)
 	{
-		EmitSound( "Portal.open_red" );
-	}
-	else
-	{
-		EmitSound( "Portal.open_blue" );
+		if (m_bIsPortal2)
+		{
+			EmitSound("Portal.open_red");
+		}
+		else
+		{
+			EmitSound("Portal.open_blue");
+		}
 	}
 }
 

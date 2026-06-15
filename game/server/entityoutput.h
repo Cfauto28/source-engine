@@ -29,6 +29,7 @@ class CEventAction
 {
 public:
 	CEventAction( const char *ActionData = NULL );
+	CEventAction( const CEventAction &p_EventAction );
 
 	string_t m_iTarget; // name of the entity(s) to cause the action in
 	string_t m_iTargetInput; // the name of the action to fire
@@ -63,6 +64,7 @@ public:
 
 	void ParseEventAction( const char *EventData );
 	void AddEventAction( CEventAction *pEventAction );
+	void RemoveEventAction( CEventAction *pEventAction );
 
 	int Save( ISave &save );
 	int Restore( IRestore &restore, int elementCount );
@@ -78,12 +80,15 @@ public:
 	/// Delete every single action in the action list. 
 	void DeleteAllElements( void ) ;
 
+	CEventAction *GetFirstAction() { return m_ActionList; }
+
+	const CEventAction *GetActionForTarget( string_t iSearchTarget ) const;
 protected:
 	variant_t m_Value;
 	CEventAction *m_ActionList;
 	DECLARE_SIMPLE_DATADESC();
 
-	CBaseEntityOutput() = default; // this class cannot be created, only it's children
+	CBaseEntityOutput() {} // this class cannot be created, only it's children
 
 private:
 	CBaseEntityOutput( CBaseEntityOutput& ); // protect from accidental copying
@@ -128,7 +133,7 @@ public:
 // Template specializations for type Vector, so we can implement Get, Set, and Init differently.
 //
 template<>
-class CEntityOutputTemplate<class Vector, FIELD_VECTOR> : public CBaseEntityOutput
+class CEntityOutputTemplate< Vector, FIELD_VECTOR> : public CBaseEntityOutput
 {
 public:
 	void Init( const Vector &value )
@@ -146,11 +151,34 @@ public:
 	{
 		m_Value.Vector3D(vec);
 	}
+
+#ifdef MAPBASE
+	// Shortcut to using QAngles in Vector outputs, makes it look cleaner and allows easy modification
+	void Init( const QAngle &value )
+	{
+		// reinterpret_cast<const Vector&>(value)
+		m_Value.SetAngle3D( value );
+	}
+
+	// Shortcut to using QAngles in Vector outputs, makes it look cleaner and allows easy modification
+	void Set( const QAngle &value, CBaseEntity *pActivator, CBaseEntity *pCaller )
+	{
+		// reinterpret_cast<const Vector&>(value)
+		m_Value.SetAngle3D( value );
+		FireOutput( m_Value, pActivator, pCaller );
+	}
+
+	// Shortcut to using QAngles in Vector outputs, makes it look cleaner and allows easy modification
+	void Get( QAngle &ang )
+	{
+		m_Value.Angle3D(ang);
+	}
+#endif
 };
 
 
 template<>
-class CEntityOutputTemplate<class Vector, FIELD_POSITION_VECTOR> : public CBaseEntityOutput
+class CEntityOutputTemplate< Vector, FIELD_POSITION_VECTOR> : public CBaseEntityOutput
 {
 public:
 	void Init( const Vector &value )

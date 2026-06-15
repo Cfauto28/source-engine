@@ -13,8 +13,8 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\portal;.\hl2;.\episodic;$SRCDIR\game\shared\Multiplayer;$SRCDIR\game\shared\hl2;$SRCDIR\game\shared\portal;.\portal"
-		$PreprocessorDefinitions		"$BASE;PORTAL;HL2_DLL;HL2_EPISODIC;USES_SAVERESTORE"
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\portal;.\hl2;.\episodic;$SRCDIR\game\shared\episodic;$SRCDIR\game\shared\Multiplayer;$SRCDIR\game\shared\hl2;$SRCDIR\game\shared\portal;.\portal;.\portal2"
+		$PreprocessorDefinitions		"$BASE;PORTAL;PORTAL2;HL2_DLL;HL2_EPISODIC;USES_SAVERESTORE"
 	}
 }
 
@@ -52,6 +52,12 @@ $Project "Server (Portal)"
 			$File	"hl2\ai_allymanager.cpp"
 			$File	"hl2\ai_behavior_actbusy.cpp"
 			$File	"hl2\ai_behavior_actbusy.h"
+			$File	"$SRCDIR\game\shared\episodic\npc_advisor_shared.h"
+			$File	"episodic\npc_advisor.cpp"
+			$File	"episodic\npc_combine_cannon.cpp"
+			$File	"episodic\npc_magnusson.cpp"
+			$File	"episodic\prop_scalable.cpp"
+			$File	"episodic\npc_puppet.cpp"
 			$File	"hl2\ai_behavior_operator.cpp"
 			$File	"hl2\ai_behavior_operator.h"
 			$File	"episodic\ai_behavior_alyx_injured.cpp"
@@ -227,6 +233,7 @@ $Project "Server (Portal)"
 			$File	"hl2\vehicle_jeep.cpp"
 			$File	"hl2\vehicle_prisoner_pod.cpp"
 			$File	"hl2\vehicle_viewcontroller.cpp"
+			$File	"physgun.cpp"
 			$File	"hl2\weapon_357.cpp"
 			$File	"hl2\weapon_alyxgun.cpp"
 			$File	"hl2\weapon_alyxgun.h"
@@ -351,6 +358,93 @@ $Project "Server (Portal)"
 				$File	"portal\weapon_portalgun.h"
 				$File	"$SRCDIR\game\shared\portal\weapon_portalgun_shared.cpp"
 				$File	"$SRCDIR\game\shared\portal\weapon_portalgun_shared.h"
+			}
+		}
+
+		$Folder	"Portal re2"
+		{
+			$File	"portal\remake\env_portal_laser.cpp"
+			$File	"portal\remake\prop_laser_catcher.cpp"
+			$File	"portal\remake\prop_weightedcube.cpp"
+
+			$File	"portal2\prop_testchamber_door.cpp"
+			$File	"portal2\prop_floor_button.cpp"
+			$File	"portal2\prop_button.cpp"
+			$File	"portal2\point_changelevel.cpp"
+			$File	"portal2\npc_personality_core.cpp"
+			$File	"portal2\npc_wheatley_boss.cpp"
+			$File	"portal2\indicator_panel.cpp"
+
+			$File   "movie_display.cpp"
+
+			$File   "portal2\trigger_catapult.cpp"
+			$File	"$SRCDIR\game\shared\portal2\trigger_catapult_shared.cpp"
+
+			//$Folder "Paint"
+			//{
+			//	// shared
+			//	$File	"$SRCDIR\game\shared\portal\paintable_entity.h"
+			//	$File	"$SRCDIR\game\shared\portal\prop_paint_power_user.h"
+			//	$File	"$SRCDIR\game\shared\portal\player_pickup_paint_power_user.h"
+			//	$File	"$SRCDIR\game\shared\portal\paint_color_manager.h"
+			//	$File	"$SRCDIR\game\shared\portal\paint_color_manager.cpp"
+			//	$File	"$SRCDIR\game\shared\portal\paint_power_user_interface.h"
+			//	$File	"$SRCDIR\game\shared\portal\paint_power_user_interface.cpp"
+			//	$File	"$SRCDIR\game\shared\portal\paint_power_user.h"
+			//	$File	"$SRCDIR\game\shared\portal\paint_power_info.h"
+			//	$File	"$SRCDIR\game\shared\portal\paint_power_info.cpp"
+			//	$File	"$SRCDIR\game\shared\portal\stick_partner.h"
+			//	$File	"$SRCDIR\game\shared\portal\stick_partner.cpp"
+			//	$File	"$SRCDIR\game\shared\portal\paint_blobs_shared.h"
+			//	$File	"$SRCDIR\game\shared\portal\paint_blobs_shared.cpp"
+			//	$File	"$SRCDIR\game\shared\portal\paint_stream_manager.h"
+			//	$File	"$SRCDIR\game\shared\portal\paint_stream_manager.cpp"
+			//	$File	"$SRCDIR\game\shared\portal\paint_sprayer_shared.h"
+			//	$File	"$SRCDIR\game\shared\portal\paint_sprayer_shared.cpp"
+			//	$File	"$SRCDIR\game\shared\portal\paint_cleanser_manager.h"
+			//	$File	"$SRCDIR\game\shared\portal\paint_cleanser_manager.cpp"
+			//	//$File	"$SRCDIR\game\shared\portal\weapon_paintgun_shared.h"
+			//	//$File	"$SRCDIR\game\shared\portal\weapon_paintgun_shared.cpp"
+			//	$File	"$SRCDIR\game\shared\portal\paint_stream_shared.h"
+			//	$File	"$SRCDIR\game\shared\portal\paint_stream_shared.cpp"
+			//	$File	"$SRCDIR\game\shared\portal2\paint_saverestore.h"
+			//	$File	"$SRCDIR\game\shared\portal2\paint_saverestore.cpp"
+			//	
+			//	// server
+			//	$File	"portal2\paint_database.h"
+			//	$File	"portal2\paint_database.cpp"
+			//	$File	"portal2\paint_sprayer.h"
+			//	$File	"portal2\paint_sprayer.cpp"
+			//	$File	"portal2\trigger_paint_cleanser.h"
+			//	$File	"portal2\trigger_paint_cleanser.cpp"
+			//	//$File	"portal2\weapon_paintgun.h"
+			//	//$File	"portal2\weapon_paintgun.cpp"
+			//	//$File	"portal2\paint_swap_guns.h"
+			//	//$File	"portal2\paint_swap_guns.cpp"
+			//	$File	"portal2\item_paint_power_pickup.cpp"
+			//	$File	"portal2\prop_paint_bomb.h"
+			//	$File	"portal2\prop_paint_bomb.cpp"
+			//	$File	"portal2\paint_bot_temp.h"
+			//	$File	"portal2\paint_bot_temp.cpp"
+			//	$File	"portal2\prop_physics_paintable.cpp"
+			//	$File	"portal2\cpaintblob.h"
+			//	$File	"portal2\cpaintblob.cpp"
+			//	$File	"portal2\paint_stream.h"
+			//	$File	"portal2\paint_stream.cpp"
+			//	$File	"portal2\paint_sphere.h"
+			//	$File	"portal2\paint_sphere.cpp"
+			//	
+			//	$Folder	"Additional Public Header Files"
+			//	{
+			//		$File	"$SRCDIR\public\meshutils\mesh.h"
+			//	}
+
+				$Folder	"Additional Link Libraries"
+				{
+					$Lib	"$LIBPUBLIC\meshutils"
+					$Lib	"$LIBCOMMON\blobulator" [$WIN32||$POSIX]
+					$Lib	"$LIBCOMMON\fileextd"	[$WIN32 && !$NO_CEG]
+				}
 			}
 		}
 	}

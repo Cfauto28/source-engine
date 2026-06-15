@@ -30,9 +30,13 @@ public:
 	virtual const QAngle&			GetRenderAngles( void ) { return vec3_angle; }
 	virtual bool					ShouldDraw( void ) { return true; }
 	virtual bool					IsTransparent( void ) { return true; }
-	virtual bool					ShouldReceiveProjectedTextures( int flags ) { return false; }
+	virtual bool					ShouldReceiveProjectedTextures( int flags ) { return true; }
 	virtual int						DrawModel( int flags );
+	
 
+	matrix3x4_t worldTransform;
+	const matrix3x4_t& RenderableToWorldTransform() { return worldTransform; }
+	
 	// Returns the bounds relative to the origin (render bounds)
 	virtual void	GetRenderBounds( Vector& mins, Vector& maxs )
 	{
@@ -85,6 +89,17 @@ public:
 		m_beam.Update( this );
 	}
 
+	void CreateMove(float flInputSampleTime, CUserCmd* pCmd, const QAngle& vecOldViewAngles)
+	{
+		BaseClass::CreateMove(flInputSampleTime, pCmd, vecOldViewAngles);
+
+		// Block angular movement when IN_ATTACK is pressed
+		if ((pCmd->buttons & IN_ATTACK) && (pCmd->buttons & IN_USE))
+		{
+			VectorCopy(vecOldViewAngles, pCmd->viewangles);
+		}
+	}
+
 private:
 	C_WeaponGravityGun( const C_WeaponGravityGun & );
 
@@ -105,6 +120,7 @@ END_RECV_TABLE()
 C_BeamQuadratic::C_BeamQuadratic()
 {
 	m_pOwner = NULL;
+	m_hRenderHandle = INVALID_CLIENT_RENDER_HANDLE;
 }
 
 void C_BeamQuadratic::Update( C_BaseEntity *pOwner )
@@ -124,6 +140,7 @@ void C_BeamQuadratic::Update( C_BaseEntity *pOwner )
 	else if ( !m_active && m_hRenderHandle != INVALID_CLIENT_RENDER_HANDLE )
 	{
 		ClientLeafSystem()->RemoveRenderable( m_hRenderHandle );
+		m_hRenderHandle = INVALID_CLIENT_RENDER_HANDLE;
 	}
 }
 
@@ -159,7 +176,8 @@ int	C_BeamQuadratic::DrawModel( int )
 	}
 
 	float scrollOffset = gpGlobals->curtime - (int)gpGlobals->curtime;
-	materials->Bind( pMat );
+	CMatRenderContextPtr pRenderContext(materials);
+	pRenderContext->Bind( pMat );
 	DrawBeamQuadratic( points[0], points[1], points[2], 13, color, scrollOffset );
 	return 1;
 }

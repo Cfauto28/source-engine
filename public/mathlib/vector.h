@@ -182,6 +182,12 @@ public:
 	// assignment
 	Vector& operator=(const Vector &vOther);
 
+	// returns 0, 1, 2 corresponding to the component with the largest absolute value
+	inline int LargestComponent() const;
+	inline vec_t LargestComponentValue() const;
+	inline int SmallestComponent() const;
+	inline vec_t SmallestComponentValue() const;
+
 	// 2d
 	vec_t	Length2D(void) const;					
 	vec_t	Length2DSqr(void) const;					
@@ -1216,6 +1222,56 @@ inline void CrossProduct(const Vector& a, const Vector& b, Vector& result )
 	result.z = a.x*b.y - a.y*b.x;
 }
 
+inline int Vector::LargestComponent() const
+{
+	float flAbsx = fabs(x);
+	float flAbsy = fabs(y);
+	float flAbsz = fabs(z);
+	if ( flAbsx > flAbsy )
+	{
+		if ( flAbsx > flAbsz )
+			return X_INDEX;
+		return Z_INDEX;
+	}
+	if ( flAbsy > flAbsz )
+		return Y_INDEX;
+	return Z_INDEX;
+}
+
+inline int Vector::SmallestComponent() const
+{
+	float flAbsx = fabs( x );
+	float flAbsy = fabs( y );
+	float flAbsz = fabs( z );
+	if ( flAbsx < flAbsy )
+	{
+		if ( flAbsx < flAbsz )
+			return X_INDEX;
+		return Z_INDEX;
+	}
+	if ( flAbsy < flAbsz )
+		return Y_INDEX;
+	return Z_INDEX;
+}
+
+
+inline float Vector::LargestComponentValue() const
+{
+	float flAbsX = fabs( x );
+	float flAbsY = fabs( y );
+	float flAbsZ = fabs( z );
+	return MAX( MAX( flAbsX, flAbsY ), flAbsZ );
+}
+
+inline float Vector::SmallestComponentValue() const
+{
+	float flAbsX = fabs( x );
+	float flAbsY = fabs( y );
+	float flAbsZ = fabs( z );
+	return MIN( MIN( flAbsX, flAbsY ), flAbsZ );
+}
+
+
 inline vec_t DotProductAbs( const Vector &v0, const Vector &v1 )
 {
 	CHECK_VALID(v0);
@@ -1554,6 +1610,10 @@ public:
 
 	inline void Init(vec_t ix=0.0f, vec_t iy=0.0f, vec_t iz=0.0f, vec_t iw=0.0f)	{ x = ix; y = iy; z = iz; w = iw; }
 
+#ifdef MAPBASE_VSCRIPT
+	// Needed to get around vec_t recognition and inlining
+	void ScriptInit( float ix, float iy, float iz, float iw ) { Init( ix, iy, iz, iw ); }
+#endif
 	bool IsValid() const;
 	void Invalidate();
 
@@ -2303,6 +2363,16 @@ inline bool Vector::IsLengthGreaterThan( float val ) const
 inline bool Vector::IsLengthLessThan( float val ) const
 {
 	return LengthSqr() < val*val;
+}
+
+inline float Snap( float a, float flSnap )
+{
+	return floorf( a / flSnap + 0.5f ) * flSnap;
+}
+
+inline  const Vector Snap( const Vector &a, float flSnap )
+{
+	return Vector( Snap( a.x, flSnap ), Snap( a.y, flSnap ), Snap( a.z, flSnap ) );
 }
 
 #endif

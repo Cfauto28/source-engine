@@ -331,7 +331,7 @@ void CWeaponPortalgun::FirePortalDirection2( inputdata_t &inputdata )
 
 float CWeaponPortalgun::TraceFirePortal( bool bPortal2, const Vector &vTraceStart, const Vector &vDirection, trace_t &tr, Vector &vFinalPosition, QAngle &qFinalAngles, int iPlacedBy, bool bTest /*= false*/ )
 {
-	CTraceFilterSimpleClassnameList baseFilter( this, COLLISION_GROUP_NONE );
+	CTraceFilterSimpleClassnameList baseFilter( this, COLLISION_GROUP_PROJECTILE );
 	UTIL_Portal_Trace_Filter( &baseFilter );
 	CTraceFilterTranslateClones traceFilterPortalShot( &baseFilter );
 
@@ -734,3 +734,30 @@ static void change_portalgun_linkage_id_f( const CCommand &args )
 }
 
 ConCommand change_portalgun_linkage_id( "change_portalgun_linkage_id", change_portalgun_linkage_id_f, "Changes the portal linkage ID for the portal gun held by the commanding player.", FCVAR_CHEAT );
+
+//====================================================================================
+// WEAPON BEHAVIOUR
+//====================================================================================
+void CWeaponPortalgun::ItemPostFrame(void)
+{
+	BaseClass::ItemPostFrame();
+
+	if (m_bInReload)
+		return;
+
+	CBasePlayer *pOwner = ToBasePlayer(GetOwner());
+
+	if (pOwner == NULL)
+		return;
+
+	//Allow a refire as fast as the player can click
+	if (((pOwner->m_nButtons & IN_ATTACK) == false) && (m_flSoonestPrimaryAttack < gpGlobals->curtime))
+	{
+		m_flNextPrimaryAttack = gpGlobals->curtime - 0.1f;
+	}
+
+	if (((pOwner->m_nButtons & IN_ATTACK2) == false) && (m_flSoonestPrimaryAttack < gpGlobals->curtime)) // we use the same delay as primary attack that's why m_flSoonestPrimaryAttack is used
+	{
+		m_flNextSecondaryAttack = gpGlobals->curtime - 0.1f;
+	}
+}

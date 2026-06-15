@@ -62,6 +62,7 @@ typedef __vector4 u32x4; // a VMX register; just a way of making it explicit tha
 typedef __m128 fltx4;
 typedef __m128 i32x4;
 typedef __m128 u32x4;
+typedef fltx4 bi32x4;
 
 #endif
 
@@ -1911,6 +1912,21 @@ FORCEINLINE fltx4 SplatWSIMD( fltx4 const &a )
 	return _mm_shuffle_ps( a, a, _MM_SHUFFLE( 3, 3, 3, 3 ) );
 }
 
+FORCEINLINE fltx4 ShuffleXXYY( const fltx4 &a )
+{
+	return _mm_shuffle_ps( a, a, MM_SHUFFLE_REV( 0, 0, 1, 1 ) );
+}
+
+FORCEINLINE fltx4 ShuffleXYXY( const fltx4 &a )
+{
+	return _mm_shuffle_ps( a, a, MM_SHUFFLE_REV( 0, 1, 0, 1 ) );
+}
+
+FORCEINLINE fltx4 ShuffleZZWW( const fltx4 &a )
+{
+	return _mm_shuffle_ps( a, a, MM_SHUFFLE_REV( 2, 2, 3, 3 ) );
+}
+
 FORCEINLINE fltx4 SetXSIMD( const fltx4& a, const fltx4& x )
 {
 	fltx4 result = MaskedAssign( LoadAlignedSIMD( g_SIMD_ComponentMask[0] ), x, a );
@@ -2441,7 +2457,56 @@ FORCEINLINE void ConvertStoreAsIntsSIMD(intx4 * RESTRICT pDest, const fltx4 &vSr
 }
 
 
+// // Some convenience operator overloads, which are just aliasing the functions above.
+// Unneccessary on 360, as you already have them from xboxmath.h (same for PS3 PPU and SPU)
+#if !defined(PLATFORM_PPC) && !defined( POSIX ) && !defined(SPU)
+#if 1  // TODO: verify generation of non-bad code. 
+// Componentwise add
+FORCEINLINE fltx4 operator+( FLTX4 a, FLTX4 b )
+{
+	return AddSIMD( a, b );
+}
 
+// Componentwise subtract
+FORCEINLINE fltx4 operator-( FLTX4 a, FLTX4 b )
+{
+	return SubSIMD( a, b );
+}
+
+// Componentwise multiply
+FORCEINLINE fltx4 operator*( FLTX4 a, FLTX4 b )
+{
+	return MulSIMD( a, b );
+}
+
+// No divide. You need to think carefully about whether you want a reciprocal
+// or a reciprocal estimate.
+
+// bitwise and
+FORCEINLINE fltx4 operator&( FLTX4 a, FLTX4 b )
+{
+	return AndSIMD( a ,b );
+}
+
+// bitwise or
+FORCEINLINE fltx4 operator|( FLTX4 a, FLTX4 b )
+{
+	return OrSIMD( a, b );
+}
+
+// bitwise xor
+FORCEINLINE fltx4 operator^( FLTX4 a, FLTX4 b )
+{
+	return XorSIMD( a, b );
+}
+
+// unary negate
+FORCEINLINE fltx4 operator-( FLTX4 a )
+{
+	return NegSIMD( a );
+}
+#endif // 0
+#endif
 #endif
 
 
@@ -3123,5 +3188,32 @@ FORCEINLINE int BoxOnPlaneSideSIMD( const fltx4& emins, const fltx4& emaxs, cons
 	ConvertStoreAsIntsSIMD( &sides, result );
 	return sides[0];
 }
+
+
+// Some convenience operator overloads, which are just aliasing the functions above.
+// Unneccessary on 360, as you already have them from xboxmath.h
+// Componentwise add
+#ifndef COMPILER_GCC
+
+FORCEINLINE fltx4 operator+=( fltx4 &a, FLTX4 b )
+{
+	a = AddSIMD( a, b );
+	return a;
+}
+
+FORCEINLINE fltx4 operator-=( fltx4 &a, FLTX4 b )
+{
+	a = SubSIMD( a, b );
+	return a;
+}
+
+
+FORCEINLINE fltx4 operator*=( fltx4 &a, FLTX4 b )
+{
+	a = MulSIMD( a, b );
+	return a;
+}
+
+#endif
 
 #endif // _ssemath_h

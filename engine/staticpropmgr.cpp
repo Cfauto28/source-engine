@@ -1120,9 +1120,6 @@ void CStaticProp::InsertPropIntoKDTree()
 		}
 		else
 		{
-			char szModel[MAX_PATH];
-			Q_strncpy( szModel, m_pModel ? modelloader->GetName( m_pModel ) : "unknown model", sizeof( szModel ) );
-			Warning( "SOLID_VPHYSICS static prop with no vphysics model! (%s)\n", szModel );
 			m_nSolidType = SOLID_NONE;
 			return;
 		}
@@ -1212,7 +1209,7 @@ void CStaticProp::CreateVPhysics( IPhysicsEnvironment *pPhysEnv, IVPhysicsKeyHan
 	solid.params.pGameData = pGameData;
 	solid.params.pName = "prop_static";
 
-	int surfaceData = physprop->GetSurfaceIndex( solid.surfaceprop );
+	int surfaceData = physprops->GetSurfaceIndex( solid.surfaceprop );
 	pPhysEnv->CreatePolyObjectStatic( pPhysCollide, 
 		surfaceData, m_Origin, m_Angles, &solid.params );
 	//PhysCheckAdd( pPhys, "Static" );

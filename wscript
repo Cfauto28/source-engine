@@ -90,6 +90,7 @@ projects={
 		'vphysics',
 		'vpklib',
 		'vstdlib',
+		'vscript',
 		'vtf',
 		'utils/vtex',
 		'unicode',
@@ -144,6 +145,7 @@ projects={
 		'vphysics',
 		'vpklib',
 		'vstdlib',
+		'vscript',
 		'vtf',
 		'stub_steam'
 	]
@@ -474,7 +476,7 @@ def configure(conf):
 		compiler_optional_flags = ['-w']
 	else:
 		compiler_optional_flags = [
-			'-Wall',
+			# '-Wall',
 			'-fdiagnostics-color=always',
 			'-Wcast-align',
 			'-Wuninitialized',
@@ -486,6 +488,9 @@ def configure(conf):
 			'-Wno-unused-but-set-variable',
 			'-Wno-unused-value',
 			'-Wno-unused-variable',
+			'-Wno-sign-compare',
+			'-Wno-class-memaccess',
+			'-Wno-write-strings',
 			'-faligned-new',
 		]
 

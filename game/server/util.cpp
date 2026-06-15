@@ -295,6 +295,12 @@ int UTIL_EntitiesInSphere( const Vector &center, float radius, CFlaggedEntitiesE
 	return pEnum->GetCount();
 }
 
+int UTIL_EntitiesAtPoint( const Vector &point, CFlaggedEntitiesEnum *pEnum )
+{
+	partition->EnumerateElementsAtPoint( PARTITION_ENGINE_NON_STATIC_EDICTS, point, false, pEnum );
+	return pEnum->GetCount();
+}
+
 CEntitySphereQuery::CEntitySphereQuery( const Vector &center, float radius, int flagMask )
 {
 	m_listIndex = 0;
@@ -655,6 +661,44 @@ CBasePlayer *UTIL_GetListenServerHost( void )
 	}
 
 	return UTIL_PlayerByIndex( 1 );
+}
+
+//
+// Returns nearest player. 
+// Control with boolean if line of sight is needed.
+// Taken from https://developer.valvesoftware.com/wiki/GetLocalPlayer
+CBasePlayer *UTIL_GetNearestPlayer(CBaseEntity *pLooker, bool bNeedsLOS)
+{
+	float flFinalDistance = 99999.0f;
+	CBasePlayer *pFinalPlayer = NULL;
+
+	for (int i = 1; i < gpGlobals->maxClients; i++)
+	{
+		CBasePlayer *pPlayer = UTIL_PlayerByIndex(i);
+
+		if (!pPlayer){
+			continue;
+		}
+
+		float flDistance = (pPlayer->GetAbsOrigin() - pLooker->GetAbsOrigin()).LengthSqr();
+
+		if (flDistance < flFinalDistance)
+		{
+			if (bNeedsLOS)
+			{
+				//Check if the player is visible to the entity (only brushes obstruct vision)
+				if (!pLooker->FVisible(pPlayer, MASK_SOLID_BRUSHONLY))
+				{
+					continue;
+				}				
+			}
+			
+			pFinalPlayer = pPlayer;
+			flFinalDistance = flDistance;
+		}
+	}
+
+	return pFinalPlayer;
 }
 
 
@@ -1869,7 +1913,7 @@ extern "C" void Sys_Error( char *error, ... )
 //			*mapData - pointer a block of entity map data
 // Output : -1 if the entity was not successfully created; 0 on success
 //-----------------------------------------------------------------------------
-int DispatchSpawn( CBaseEntity *pEntity )
+int DispatchSpawn( CBaseEntity *pEntity, bool bRunVScripts )
 {
 	if ( pEntity )
 	{
@@ -1883,6 +1927,12 @@ int DispatchSpawn( CBaseEntity *pEntity )
 		// is this necessary?
 		//pEntity->SetAbsMins( pEntity->GetOrigin() - Vector(1,1,1) );
 		//pEntity->SetAbsMaxs( pEntity->GetOrigin() + Vector(1,1,1) );
+
+		if (bRunVScripts)
+		{
+			pEntity->RunVScripts();
+			pEntity->RunPrecacheScripts();
+		}
 
 #if defined(TRACK_ENTITY_MEMORY) && defined(USE_MEM_DEBUG)
 		const char *pszClassname = NULL;
@@ -1950,6 +2000,11 @@ int DispatchSpawn( CBaseEntity *pEntity )
 		}
 
 		gEntList.NotifySpawn( pEntity );
+
+		if( bRunVScripts )
+		{
+			pEntity->RunOnPostSpawnScripts();
+		}
 	}
 
 	return 0;
