@@ -50,6 +50,9 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Install dependencies
+        run: brew install sdl2
+
       - name: Configure
         run: ./waf configure $WAF_FLAGS
       - name: Build macos-amd64
