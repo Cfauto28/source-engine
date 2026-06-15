@@ -27,6 +27,7 @@ Release_*/
 *.exp
 *.ilk
 *.so
+*.kate-swp
 ValveETWProviderEvents.h
 game/client/*/client.lib
 game/server/*/server.lib
