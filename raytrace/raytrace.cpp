@@ -270,12 +270,6 @@ static fltx4 FourEpsilons={1.0e-10,1.0e-10,1.0e-10,1.0e-10};
 static fltx4 FourZeros={1.0e-10,1.0e-10,1.0e-10,1.0e-10};
 static fltx4 FourNegativeEpsilons={-1.0e-10,-1.0e-10,-1.0e-10,-1.0e-10};
 
-static float BoxSurfaceArea(Vector const &boxmin, Vector const &boxmax)
-{
-	Vector boxdim=boxmax-boxmin;
-	return 2.0*((boxdim[0]*boxdim[2])+(boxdim[0]*boxdim[1])+(boxdim[1]*boxdim[2]));
-}
-
 void RayTracingEnvironment::Trace4Rays(const FourRays &rays, fltx4 TMin, fltx4 TMax,
 									   RayTracingResult *rslt_out,
 									   int32 skip_id, ITransparentTriangleCallback *pCallback)
