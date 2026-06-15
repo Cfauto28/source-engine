@@ -8,14 +8,14 @@ jobs:
   tests-linux:
     strategy:
       matrix:
-        os: [ubuntu-latest, ubuntu-20.04]
+        os: [ubuntu-latest]
         bits: ['', '--32bits']
         android: ['']
     runs-on: ${{ matrix.os }}
     env:
       DEPS: libbz2-dev
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -46,7 +46,7 @@ jobs:
   tests-macos:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -62,17 +62,16 @@ jobs:
   tests-windows:
     strategy:
       matrix:
-        os: [windows-2019]
+        os: [windows-2022]
         bits: ['', '--32bits']
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Configure
         run: ./waf configure ${{ matrix.bits }} ${{ env.WAF_FLAGS }}
-
       - name: Build ${{ matrix.os }}
         run: ./waf install
       - name: Run tests
@@ -80,3 +79,4 @@ jobs:
           cd build_tests
           $env:Path = "bin";
           ./unittest.exe
+

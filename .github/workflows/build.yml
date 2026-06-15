@@ -22,7 +22,7 @@ jobs:
     env:
       DEPS: libopenal-dev libpng-dev libjpeg-dev libfreetype6-dev libfontconfig1-dev libcurl4-gnutls-dev libsdl2-dev zlib1g-dev libbz2-dev libedit-dev
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -48,24 +48,24 @@ jobs:
           export NDK_HOME=$PWD/android-ndk-r10e/
           echo "NDK_HOME=$NDK_HOME" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=$NDK_HOME" >> $GITHUB_ENV
-
       - name: Configure
         run: ./waf configure ${{ matrix.bits }} ${{ matrix.android }} ${{ matrix.flags }} $WAF_FLAGS
       - name: Build ${{ matrix.os }}
         run: ./waf install --strip-to-file
       - name: Upload build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux${{matrix.bits}}${{matrix.flags}}${{matrix.android}}
           path: |
             build_hl2
             !build_hl2/**/*.debug
       - name: Upload debug symbols
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: debug-Linux${{matrix.bits}}${{matrix.flags}}${{matrix.android}}
           path: |
             build_hl2/**/*.debug
+
 
   build-macos:
     strategy:
@@ -74,7 +74,7 @@ jobs:
         flags: ['', '-d']
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -86,16 +86,16 @@ jobs:
       - name: Build macos-amd64
         run: ./waf install --strip-to-file
       - name: Upload build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: macOS${{matrix.flags}}${{matrix.android}}
+          name: macOS${{matrix.flags}}
           path: |
             build_hl2
             !build_hl2/**/*.dSYM
       - name: Upload debug symbols
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: debug-macOS${{matrix.flags}}${{matrix.android}}
+          name: debug-macOS${{matrix.flags}}
           path: |
             build_hl2/**/*.dSYM
 
@@ -103,12 +103,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2019]
+        os: [windows-2022]
         bits: ['', '--32bits']
         flags: ['', '-d']
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -116,10 +116,11 @@ jobs:
         run: ./waf configure ${{ matrix.bits }} ${{ matrix.flags }} ${{ env.WAF_FLAGS }}
       - name: Build ${{ matrix.os }}
         run: ./waf install
-      - name: 'Upload build'
-        uses: actions/upload-artifact@v3
+      - name: Upload build
+        uses: actions/upload-artifact@v4
         with:
           name: windows${{matrix.bits}}${{matrix.flags}}
           path: |
             build_hl2
             !build_hl2/**/*.pdb
+

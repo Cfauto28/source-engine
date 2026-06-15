@@ -21,6 +21,7 @@ This project is using waf buildsystem. If you have waf-related questions look ht
 - [x] Fixed many bugs
 - [x] Serverbrowser works without steam
 - [x] VScript support (based on the Mapbase implementation)
+- [x] Utils port (Most important command-line utils have been ported)
 - [ ] Rewrite materialsystem for OpenGL render
 - [ ] dxvk-native support
 - [ ] Elbrus port

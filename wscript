@@ -148,7 +148,45 @@ projects={
 		'vscript',
 		'vtf',
 		'stub_steam'
-	]
+	],
+	'utils': [
+		'appframework',
+		'filesystem',
+		'tier0',
+		'tier1',
+		'tier2',
+		'tier3',
+		'mathlib',
+		'vstdlib',
+		'vpklib',
+		'bitmap',
+		'vtf',
+		'fgdlib',
+		'raytrace',
+		'vphysics',
+#		'movieobjects',
+#		'hammer_launcher',
+		'ivp/havana',
+		'ivp/havana/havok/hk_base',
+		'ivp/havana/havok/hk_math',
+		'ivp/ivp_compact_builder',
+		'ivp/ivp_physics',
+		'materialsystem',
+		'materialsystem/shaderapiempty',
+		'materialsystem/shaderlib',
+		'utils/bsppack',
+		'utils/lzma',
+#		'utils/studiomdl',
+		'utils/vbsp',
+		'utils/vbspinfo',
+		'utils/vpk',
+		'utils/vrad',
+		'utils/vrad_launcher',
+		'utils/vtex',
+		'utils/vvis',
+		'utils/vvis_launcher',
+		'utils/xbox/xbspinfo',
+	],
 }
 
 @Configure.conf
@@ -181,6 +219,7 @@ def run_test(self, fragment, msg):
 def define_platform(conf):
 	conf.env.DEDICATED = conf.options.DEDICATED
 	conf.env.TESTS = conf.options.TESTS
+	conf.env.UTILS = conf.options.UTILS
 	conf.env.TOGLES = conf.options.TOGLES
 	conf.env.GL = conf.options.GL and not conf.options.TESTS and not conf.options.DEDICATED
 	conf.env.OPUS = conf.options.OPUS
@@ -293,8 +332,11 @@ def options(opt):
 	grp.add_option('-d', '--dedicated', action = 'store_true', dest = 'DEDICATED', default = False,
 		help = 'build dedicated server [default: %default]')
 
-	grp.add_option('--tests', action = 'store_true', dest = 'TESTS', default = False,
+	grp.add_option('-t', '--tests', action = 'store_true', dest = 'TESTS', default = False,
 		help = 'build unit tests [default: %default]')
+
+	grp.add_option('-u', '--utils', action = 'store_true', dest = 'UTILS', default = False,
+		help = 'build valve utils [default: %default]')
 
 	grp.add_option('-D', '--debug-engine', action = 'store_true', dest = 'DEBUG_ENGINE', default = False,
 		help = 'build with -DDEBUG [default: %default]')
@@ -626,6 +668,8 @@ def configure(conf):
 		conf.add_subproject(projects['tests'])
 	elif conf.options.DEDICATED:
 		conf.add_subproject(projects['dedicated'])
+	elif conf.options.UTILS:
+		conf.add_subproject(projects['utils'])
 	else:
 		conf.add_subproject(projects['game'])
 
@@ -648,6 +692,8 @@ def build(bld):
 		bld.add_subproject(projects['tests'])
 	elif bld.env.DEDICATED:
 		bld.add_subproject(projects['dedicated'])
+	elif bld.env.UTILS:
+		bld.add_subproject(projects['utils'])
 	else:
 		if bld.env.TOGLES:
 			projects['game'] += ['togles']

@@ -1,0 +1,107 @@
+name: Utils
+
+on: [push, pull_request]
+env:
+  WAF_FLAGS: -T release --disable-warns --prefix=build_utils --utils
+
+jobs:
+  tests-linux:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        bits: ['', '--32bits']
+        android: ['']
+    runs-on: ${{ matrix.os }}
+    env:
+      DEPS: libopenal-dev libpng-dev libjpeg-dev libfreetype6-dev libfontconfig1-dev libcurl4-gnutls-dev libsdl2-dev zlib1g-dev libbz2-dev libedit-dev
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install common dependencies
+        run: sudo apt-get update && sudo apt-get install -y g++-multilib gcc-multilib
+      - name: Install 32bit dependencies
+        if: ${{ matrix.bits != '' && !matrix.android }}
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install aptitude
+          sudo aptitude install -y $(echo $DEPS | sed -r 's/[a-z0-9_\-]+/&:i386/g')
+          echo "PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig" >> $GITHUB_ENV
+      - name: Install 64bit dependencies
+        if: ${{ matrix.bits == '' }}
+        run: |
+          sudo apt-get install -y $DEPS
+
+      - name: Configure
+        run: ./waf configure ${{ matrix.bits }} $WAF_FLAGS
+      - name: Build ${{ matrix.os }}
+        run: ./waf install --strip-to-file
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux${{matrix.bits}}${{matrix.flags}}${{matrix.android}}
+          path: |
+            build_utils
+            !build_utils/**/*.debug
+      - name: Upload debug symbols
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-Linux${{matrix.bits}}${{matrix.flags}}${{matrix.android}}
+          path: |
+            build_utils/**/*.debug
+
+  tests-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure
+        run: ./waf configure $WAF_FLAGS
+      - name: Build macos-arm64
+        run: ./waf install --strip-to-file
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos${{matrix.flags}}
+          path: |
+            build_utils
+            !build_utils/**/*.dSYM
+      - name: Upload debug symbols
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-macos${{matrix.flags}}
+          path: |
+            build_utils/**/*.dSYM
+
+  tests-windows:
+    strategy:
+      matrix:
+        os: [windows-2022]
+        bits: ['', '--32bits']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure
+        run: ./waf configure ${{ matrix.bits }} ${{ env.WAF_FLAGS }}
+      - name: Build ${{ matrix.os }}
+        run: ./waf install --strip-to-file
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux${{matrix.bits}}${{matrix.flags}}${{matrix.android}}
+          path: |
+            build_utils
+            !build_utils/**/*.pdb
+      - name: Upload debug symbols
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-Linux${{matrix.bits}}${{matrix.flags}}${{matrix.android}}
+          path: |
+            build_utils/**/*.pdb
