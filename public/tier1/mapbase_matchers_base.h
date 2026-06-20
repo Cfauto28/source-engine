@@ -13,6 +13,10 @@
 
 #include <math.h>
 
+#ifdef ANDROID
+	#include <stdlib.h>
+#endif
+
 #define MAPBASE_MATCHERS 1
 
 // Regular expressions based off of the std library.
