@@ -25,6 +25,6 @@ This project is using waf buildsystem. If you have waf-related questions look ht
 
 # To Do (In order)
 - [ ] Port the thing to cmake (check [here](https://github.com/valberrie/icepick)) 
-- [ ] dxvk-native support
-- [ ] Elbrus port
+- [ ] DirectX 10 (For some reason it seem to be stripped from the source code, check [Kisak-Strike](https://github.com/SwagSoftware/Kisak-Strike)) and [dxvk-native](https://github.com/doitsujin/dxvk) support
+- [ ] Elbrus port (There is a [pull request](https://github.com/nillerusr/source-engine/pull/305) in upstream)
 - [ ] Bink audio support (for video_bink, check [here](https://github.com/cherrybtw/source-engine))
