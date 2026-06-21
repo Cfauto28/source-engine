@@ -142,20 +142,25 @@ T Max( T const &val1, T const &val2 )
 #endif
 
 
-#ifndef DONT_DEFINE_BOOL // Needed for Cocoa stuff to compile.
+#if !defined (DONT_DEFINE_BOOL) && !defined (DXVK) // Needed for Cocoa stuff to compile.
 typedef int BOOL;
 #endif
 
 typedef int qboolean;
+
+#ifndef DXVK
 typedef unsigned long ULONG;
 typedef unsigned char BYTE;
 typedef unsigned char byte;
 typedef unsigned short word;
+#endif
+
 #ifdef _WIN32
 typedef wchar_t ucs2; // under windows wchar_t is ucs2
 #else
 typedef unsigned short ucs2;
 #endif
+
 
 enum ThreeState_t
 {

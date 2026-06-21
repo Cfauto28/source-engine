@@ -1425,17 +1425,18 @@ TOGL_INTERFACE HRESULT D3DXCompileShader(
 #else
 
 	//USE_ACTUAL_DX
-	#ifndef WIN32
-	#error sorry man
-	#endif
 
 	#ifdef _X360
 		#include "d3d9.h"
 		#include "d3dx9.h"
-	#else
+	#elif defined (WIN32)
 		#include <windows.h>
 		#include "../../dx9sdk/include/d3d9.h"
 		#include "../../dx9sdk/include/d3dx9.h"
+	#elif defined (DXVK)
+		#include "../../dxvknative/include/windows.h"
+		#include "../../dxvknative/include/d3d9.h"
+		#include "../../dxvknative/include/d3dx9.h"
 	#endif
 	typedef HWND VD3DHWND;
 

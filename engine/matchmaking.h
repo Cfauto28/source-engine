@@ -320,7 +320,7 @@ private:
 	XSESSION_REGISTRATION_RESULTS	*m_pRegistrationResults;
 
 	// QoS Data
-	BOOL               m_bQoSTesting;
+	bool               m_bQoSTesting;
 	XNQOS              m_QoSResult;
 	XNQOS*             m_pQoSResult;
 	const XNADDR*      m_QoSxnaddr[MAX_SEARCHRESULTS];
@@ -385,7 +385,7 @@ private:
 		XUSER_SIGNIN_INFO	m_SignInInfo;
 #endif
 		DWORD				m_SignInState;
-		BOOL				m_PrivilegeMultiplayer;
+		bool				m_PrivilegeMultiplayer;
 		int					m_InviteStorageDeviceSelected;
 		int					m_bAcceptingInvite;
 	} m_InviteWaitingInfo;

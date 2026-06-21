@@ -552,7 +552,7 @@ void CM_PostTraceToDispTree( TraceInfo_t *pTraceInfo );
 //
 
 void CM_TestBoxInBrush ( const Vector& mins, const Vector& maxs, const Vector& p1,
-					  trace_t *trace, cbrush_t *brush, BOOL bDispSurf );
+					  trace_t *trace, cbrush_t *brush, bool bDispSurf );
 void FASTCALL CM_TestBoxInBrush( TraceInfo_t *pTraceInfo, const cbrush_t *brush );
 void FASTCALL CM_RecursiveHullCheck ( TraceInfo_t *pTraceInfo, int num, const float p1f, const float p2f );
 void CM_GetTraceDataForBSP( const Vector &mins, const Vector &maxs, CTraceListData &traceData );

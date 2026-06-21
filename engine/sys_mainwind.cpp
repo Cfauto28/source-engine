@@ -15,6 +15,10 @@
 
 #endif
 
+#ifdef DXVK
+#include "../dxvknative/include/dxvk/wsi/native_wsi.h"
+#endif
+
 #if defined( WIN32 ) && !defined( _X360 ) && !defined( DX_TO_GL_ABSTRACTION )
 #include "winlite.h"
 #include "xbox/xboxstubs.h"
@@ -1550,6 +1554,9 @@ void *CGame::GetMainDeviceWindow( void )
 {
 #if defined( DX_TO_GL_ABSTRACTION ) && defined( USE_SDL )
 	return (void*)m_pSDLWindow;
+#elif defined (DXVK)
+	HWND m_hWindow = dxvk::wsi::toHwnd(m_pSDLWindow);
+	return (void*)m_hWindow;
 #else
 	return (void*)m_hWindow;
 #endif
