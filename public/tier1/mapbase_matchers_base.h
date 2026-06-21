@@ -13,7 +13,7 @@
 
 #include <math.h>
 
-#ifdef ANDROID
+#ifdef ANDROID //Android shenanigans
 	#include <stdlib.h>
 #endif
 

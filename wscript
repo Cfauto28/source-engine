@@ -221,7 +221,8 @@ def define_platform(conf):
 	conf.env.TESTS = conf.options.TESTS
 	conf.env.UTILS = conf.options.UTILS
 	conf.env.TOGLES = conf.options.TOGLES
-	conf.env.GL = conf.options.GL and not conf.options.TESTS and not conf.options.DEDICATED
+	conf.env.GL = conf.options.GL and not conf.options.TESTS and not conf.options.DEDICATED and not conf.options.DXVK
+	conf.env.DXVK =conf.options.DXVK and not conf.options.TESTS and not conf.options.DEDICATED
 	conf.env.OPUS = conf.options.OPUS
 
 	arch32 = conf.run_test(CPP_32BIT_CHECK, 'Testing 32bit support')
@@ -242,6 +243,13 @@ def define_platform(conf):
 			'DX_TO_GL_ABSTRACTION',
 			'GL_GLEXT_PROTOTYPES',
 			'BINK_VIDEO'
+		])
+
+	if conf.env.DXVK:
+		conf.env.append_unique('DEFINES', [
+			'DXVK',
+			'USE_ACTUAL_DX',
+			'DXVK_WSI_SDL2'
 		])
 
 	if conf.options.TOGLES:
@@ -346,6 +354,9 @@ def options(opt):
 
 	grp.add_option('--use-togl', action = 'store', dest = 'GL', type = 'int', default = sys.platform != 'win32',
 		help = 'build engine with ToGL [default: %default]')
+
+	grp.add_option('--use-dxvk-native', action = 'store_true', dest = 'DXVK', default = False,
+		help = 'build the game with dxvk native support, EXPERIMENTAL!! [default: %default]')
 
 	grp.add_option('--game', action = 'store', dest = 'GAMES', type = 'string', default = 'hl2',
 		help = 'build game [default: %default]')

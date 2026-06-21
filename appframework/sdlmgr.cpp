@@ -709,13 +709,15 @@ void CSDLMgr::Shutdown()
 {
 	SDLAPP_FUNC;
 
+#ifndef DXVK
 	if (gGL && m_readFBO)
 #ifdef TOGLES
 		gGL->glDeleteFramebuffers(1, &m_readFBO);
 #else
 		gGL->glDeleteFramebuffersEXT(1, &m_readFBO);
-#endif
+#endif //TOGLES
 	m_readFBO = 0;
+#endif //DXVK
 
 	if ( m_Window )
 	{
