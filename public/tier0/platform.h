@@ -819,8 +819,9 @@ typedef void * HINSTANCE;
 #define _mkdir(dir) mkdir( dir, S_IRWXU | S_IRWXG | S_IRWXO )
 #define _wtoi(arg) wcstol(arg, NULL, 10)
 #define _wtoi64(arg) wcstoll(arg, NULL, 10)
-
+#ifndef DXVK
 typedef uintp HMODULE;
+#endif
 typedef void *HANDLE;
 #endif
 

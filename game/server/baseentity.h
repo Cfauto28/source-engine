@@ -2955,18 +2955,8 @@ inline const char* CBaseEntity::ScriptGetModelName(void) const
 #define SetThink( a ) ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), 0, NULL )
 #define SetContextThink( a, b, context ) ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), (b), context )
 
-#ifdef _DEBUG
 #define SetMoveDone( a ) \
-	do \
-	{ \
-		m_pfnMoveDone = static_cast <void (CBaseEntity::*)(void)> (a); \
-		FunctionCheck( (void *)*((int *)((char *)this + ( offsetof(CBaseEntity,m_pfnMoveDone)))), "BaseMoveFunc" ); 
-	} while ( 0 )
-#else
-#define SetMoveDone( a ) \
-		(void)(m_pfnMoveDone = static_cast <void (CBaseEntity::*)(void)> (a))
-#endif
-
+(void)(m_pfnMoveDone = static_cast <void (CBaseEntity::*)(void)> (a))
 
 inline bool FClassnameIs(CBaseEntity *pEntity, const char *szClassname)
 { 

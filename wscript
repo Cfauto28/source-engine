@@ -222,7 +222,7 @@ def define_platform(conf):
 	conf.env.UTILS = conf.options.UTILS
 	conf.env.TOGLES = conf.options.TOGLES
 	conf.env.GL = conf.options.GL and not conf.options.TESTS and not conf.options.DEDICATED and not conf.options.DXVK
-	conf.env.DXVK =conf.options.DXVK and not conf.options.TESTS and not conf.options.DEDICATED
+	conf.env.DXVK =conf.options.DXVK and not conf.options.TESTS and not conf.options.DEDICATED and not conf.options.TESTS
 	conf.env.OPUS = conf.options.OPUS
 
 	arch32 = conf.run_test(CPP_32BIT_CHECK, 'Testing 32bit support')
@@ -277,6 +277,7 @@ def define_platform(conf):
 		conf.env.append_unique('CFLAGS', '-U_FORTIFY_SOURCE')
 		conf.env.append_unique('CXXFLAGS', '-U_FORTIFY_SOURCE')
 	elif conf.env.DEST_OS == 'android':
+		conf.env.DXVK = False
 		conf.env.append_unique('DEFINES', [
 			'ANDROID=1', '_ANDROID=1',
 			'LINUX=1', '_LINUX=1',
@@ -287,6 +288,7 @@ def define_platform(conf):
 		])
 		
 	elif conf.env.DEST_OS == 'win32':
+		conf.env.DXVK = False
 		conf.env.append_unique('DEFINES', [
 			'WIN32=1', '_WIN32=1',
 			'_WINDOWS',
@@ -299,6 +301,7 @@ def define_platform(conf):
 			'NO_X360_XDK'
 		])
 	elif conf.env.DEST_OS == 'darwin':
+		conf.env.DXVK = False
 		conf.env.append_unique('DEFINES', [
 			'OSX=1', '_OSX=1',
 			'POSIX=1', '_POSIX=1', 'PLATFORM_POSIX=1',
@@ -308,6 +311,7 @@ def define_platform(conf):
 		])
 
 	elif conf.env.DEST_OS in ['freebsd', 'openbsd', 'netbsd', 'dragonflybsd']: # Tested only in freebsd
+		conf.env.DXVK = False
 		conf.env.append_unique('DEFINES', [
 			'POSIX=1', '_POSIX=1', 'PLATFORM_POSIX=1',
 			'GNUC', # but uses clang
@@ -644,6 +648,13 @@ def configure(conf):
 			conf.define('COMPILER_MSVC32', 1)
 		elif conf.env.DEST_CPU in ['x86_64', 'amd64']:
 			conf.define('COMPILER_MSVC64', 1)
+
+	if conf.env.DXVK and conf.env.DEST_OS == 'linux':
+		if conf.env.BIT32_MANDATORY:
+			flags += '-L'+os.path.abspath('.')+'/dxvknative/lib32/'
+		else:
+			flags += '-L'+os.path.abspath('.')+'/dxvknative/lib/'
+		flags += '-l dxvk'
 
 	if conf.env.COMPILER_CC != 'msvc':
 		conf.check_cc(cflags=cflags, linkflags=linkflags, msg='Checking for required C flags')

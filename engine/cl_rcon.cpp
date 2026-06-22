@@ -594,47 +594,8 @@ void CRConClient::GrabConsoleLog()
 //-----------------------------------------------------------------------------
 void CRConClient::SaveRemoteScreenshot( const void* pBuffer, int nBufLen )
 {
-	char pScreenshotPath[MAX_PATH];
-	do 
-	{
-		Q_snprintf( pScreenshotPath, sizeof( pScreenshotPath ), "%s/screenshot%04d.jpg", m_RemoteFileDir.Get(), m_nScreenShotIndex++ );	
-	} while ( g_pFullFileSystem->FileExists( pScreenshotPath, "MOD" ) );
-
-	char pFullPath[MAX_PATH];
-	GetModSubdirectory( pScreenshotPath, pFullPath, sizeof(pFullPath) );
-	HZIP hZip = OpenZip( (void*)pBuffer, nBufLen, ZIP_MEMORY );
-
-	int nIndex;
-	ZIPENTRY zipInfo;
-	FindZipItem( hZip, "screenshot.jpg", true, &nIndex, &zipInfo );
-	if ( nIndex >= 0 )
-	{
-		UnzipItem( hZip, nIndex, pFullPath, 0, ZIP_FILENAME );
-	}
-	CloseZip( hZip );
 }
 
 void CRConClient::SaveRemoteConsoleLog( const void* pBuffer, int nBufLen )
 {
-	if ( nBufLen == 0 )
-		return;
-
-	char pLogPath[MAX_PATH];
-	do 
-	{
-		Q_snprintf( pLogPath, sizeof( pLogPath ), "%s/console%04d.log", m_RemoteFileDir.Get(), m_nConsoleLogIndex++ );	
-	} while ( g_pFullFileSystem->FileExists( pLogPath, "MOD" ) );
-
-	char pFullPath[MAX_PATH];
-	GetModSubdirectory( pLogPath, pFullPath, sizeof(pFullPath) );
-	HZIP hZip = OpenZip( (void*)pBuffer, nBufLen, ZIP_MEMORY );
-
-	int nIndex;
-	ZIPENTRY zipInfo;
-	FindZipItem( hZip, "console.log", true, &nIndex, &zipInfo );
-	if ( nIndex >= 0 )
-	{
-		UnzipItem( hZip, nIndex, pFullPath, 0, ZIP_FILENAME );
-	}
-	CloseZip( hZip );
 }

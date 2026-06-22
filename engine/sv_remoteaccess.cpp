@@ -17,9 +17,6 @@
 #include "vprof_engine.h"
 #include "PlayerState.h"
 #include "sv_log.h"
-#ifndef SWDS
-#include "zip/XZip.h"
-#endif
 #include "cl_main.h"
 
 extern IServerGameDLL	*serverGameDLL;
@@ -256,33 +253,9 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 				break;
 
 			case SERVERDATA_TAKE_SCREENSHOT:
-#ifndef SWDS
-				m_nScreenshotListener = listener;
-				CL_TakeJpeg( );
-#endif
 				break;
 
 			case SERVERDATA_SEND_CONSOLE_LOG:
-				{
-#ifndef SWDS
-					CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
-					if ( GetConsoleLogFileData( buf ) )
-					{
-						HZIP hZip = CreateZipZ( 0, 1024 * 1024, ZIP_MEMORY );
-						void *pMem;
-						unsigned long nLen;
-						ZipAdd( hZip, "console.log", buf.Base(), buf.TellMaxPut(), ZIP_MEMORY );
-						ZipGetMemory( hZip, &pMem, &nLen );
-						SendResponseToClient( listener, SERVERDATA_CONSOLE_LOG_RESPONSE, pMem, nLen );
-						CloseZip( hZip );
-					}
-					else
-					{
-						LogCommand( listener, "Failed to read console log!\n" );
-						RespondString( listener, requestID, "Failed to read console log!\n" );
-					}
-#endif
-				}
 				break;
 			default:
 				Assert(!("Unknown requestType in CServerRemoteAccess::WriteDataRequest()"));
@@ -305,29 +278,6 @@ void CServerRemoteAccess::WriteDataRequest( ra_listener_id listener, const void 
 //-----------------------------------------------------------------------------
 void CServerRemoteAccess::UploadScreenshot( const char *pFileName )
 {
-#ifndef SWDS
-	if ( m_nScreenshotListener < 0 )
-		return;
-
-	CUtlBuffer buf( 128 * 1024, 0 );
-	if ( g_pFullFileSystem->ReadFile( pFileName, "MOD", buf ) )
-	{
-		HZIP hZip = CreateZipZ( 0, 1024 * 1024, ZIP_MEMORY );
-		void *pMem;
-		unsigned long nLen;
-		ZipAdd( hZip, "screenshot.jpg", buf.Base(), buf.TellMaxPut(), ZIP_MEMORY );
-		ZipGetMemory( hZip, &pMem, &nLen );
-		SendResponseToClient( m_nScreenshotListener, SERVERDATA_SCREENSHOT_RESPONSE, pMem, nLen );
-		CloseZip( hZip );
-	}
-	else
-	{
-		LogCommand( m_nScreenshotListener, "Failed to read screenshot!\n" );
-		RespondString( m_nScreenshotListener, 0, "Failed to read screenshot!\n" );
-	}
-
-	m_nScreenshotListener = -1;
-#endif
 }
 
 

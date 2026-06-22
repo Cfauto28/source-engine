@@ -2,7 +2,8 @@
 
 #ifdef __cplusplus
 #include <cstdint>
-#include <cstring>
+//#include <cstring>
+#include <string.h>
 #else
 #include <stdint.h>
 #include <string.h>
@@ -96,8 +97,8 @@ constexpr GUID __uuidof_helper();
 #define __uuidof(T) __uuidof_helper<T>()
 #define __uuidof_var(T) __uuidof_helper<decltype(T)>()
 
-inline bool operator==(const GUID& a, const GUID& b) { return std::memcmp(&a, &b, sizeof(GUID)) == 0; }
-inline bool operator!=(const GUID& a, const GUID& b) { return std::memcmp(&a, &b, sizeof(GUID)) != 0; }
+inline bool operator==(const GUID& a, const GUID& b) { return memcmp(&a, &b, sizeof(GUID)) == 0; }
+inline bool operator!=(const GUID& a, const GUID& b) { return memcmp(&a, &b, sizeof(GUID)) != 0; }
 
 #endif // __cplusplus
 
@@ -108,7 +109,7 @@ typedef DWORD *LPDWORD;
 typedef void* HANDLE;
 typedef HANDLE HMONITOR;
 typedef HANDLE HDC;
-//typedef HANDLE HMODULE;
+typedef HANDLE HMODULE;
 typedef HANDLE HINSTANCE;
 typedef HANDLE HWND;
 typedef HANDLE HKEY;

@@ -168,7 +168,7 @@ public:
 		int					userId;
 		byte				type;
 		byte				subtype;
-		word				flags;
+		WORD				flags;
 		bool				active;
 		XINPUT_STATE		states[2];
 		int					newState;

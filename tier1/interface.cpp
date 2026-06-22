@@ -138,7 +138,7 @@ void *GetModuleHandle(const char *name)
 //-----------------------------------------------------------------------------
 static void *Sys_GetProcAddress( const char *pModuleName, const char *pName )
 {
-	HMODULE hModule = (HMODULE)GetModuleHandle( pModuleName );
+	uintp hModule = (uintp)GetModuleHandle( pModuleName );
 #ifdef WIN32
 	return (void *)GetProcAddress( hModule, pName );
 #else
@@ -147,7 +147,7 @@ static void *Sys_GetProcAddress( const char *pModuleName, const char *pName )
 }
 
 #if !defined(LINUX)
-static void *Sys_GetProcAddress( HMODULE hModule, const char *pName )
+static void *Sys_GetProcAddress( uintp hModule, const char *pName )
 {
 #ifdef WIN32
 	return (void *)GetProcAddress( hModule, pName );
@@ -165,7 +165,7 @@ bool Sys_IsDebuggerPresent()
 struct ThreadedLoadLibaryContext_t
 {
 	const char *m_pLibraryName;
-	HMODULE m_hLibrary;
+	uintp m_hLibrary;
 };
 
 #ifdef _WIN32
@@ -191,7 +191,7 @@ uintp ThreadedLoadLibraryFunc( void *pParam )
 
 #endif // _WIN32
 
-HMODULE Sys_LoadLibrary( const char *pLibraryName, Sys_Flags flags )
+uintp Sys_LoadLibrary( const char *pLibraryName, Sys_Flags flags )
 {
 	char str[ 1024 ];
 	// Note: DLL_EXT_STRING can be "_srv.so" or "_360.dll". So be careful
@@ -252,7 +252,7 @@ HMODULE Sys_LoadLibrary( const char *pLibraryName, Sys_Flags flags )
 		dlopen_mode |= RTLD_NOLOAD;
 #endif
 
-	HMODULE ret = ( HMODULE )dlopen( str, dlopen_mode );
+	uintp ret = ( uintp )dlopen( str, dlopen_mode );
 	if ( !ret && !( flags & SYS_NOLOAD ) )
 	{
 		const char *pError = dlerror();
@@ -323,7 +323,7 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 #ifdef POSIX
 	char szModuleName[1024] = { 0 };
 #endif
-	HMODULE hDLL = NULL;
+	uintp hDLL = NULL;
 
 	if ( !Q_IsAbsolutePath( pModuleName ) )
 	{
@@ -499,7 +499,7 @@ void Sys_UnloadModule( CSysModule *pModule )
 	if ( !pModule )
 		return;
 
-	HMODULE	hDLL = reinterpret_cast<HMODULE>(pModule);
+	uintp	hDLL = reinterpret_cast<uintp>(pModule);
 
 #ifdef _WIN32
 	FreeLibrary( hDLL );
@@ -519,7 +519,7 @@ CreateInterfaceFn Sys_GetFactory( CSysModule *pModule )
 	if ( !pModule )
 		return NULL;
 
-	HMODULE	hDLL = reinterpret_cast<HMODULE>(pModule);
+	uintp	hDLL = reinterpret_cast<uintp>(pModule);
 #ifdef _WIN32
 	return reinterpret_cast<CreateInterfaceFn>(GetProcAddress( hDLL, CREATEINTERFACE_PROCNAME ));
 #elif defined(POSIX)

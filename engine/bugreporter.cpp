@@ -1672,51 +1672,12 @@ bool CBugUIPanel::IsValidSubmission( bool verbose )
 
 bool CBugUIPanel::AddBugTextToZip( char const *textfilename, char const *text, int textlen )
 {
-	if ( !m_hZip )
-	{
-		// Create using OS pagefile memory...
-		m_hZip = CreateZipZ( 0, MAX_ZIP_SIZE, ZIP_MEMORY );
-		Assert( m_hZip );
-		if ( !m_hZip )
-		{
-			return false;
-		}
-	}
-
-	ZipAdd( m_hZip, textfilename, (void *)text, textlen, ZIP_MEMORY );
-
-	return true;
+	return false;
 }
 
 
 bool CBugUIPanel::AddFileToZip( char const *relative )
 {
-	if ( !m_hZip )
-	{
-		// Create using OS pagefile memory...
-		m_hZip = CreateZipZ( 0, MAX_ZIP_SIZE, ZIP_MEMORY );
-		Assert( m_hZip );
-		if ( !m_hZip )
-		{
-			return false;
-		}
-	}
-
-	char fullpath[ 512 ];
-	if ( g_pFileSystem->RelativePathToFullPath( relative, "GAME", fullpath, sizeof( fullpath ) ) )
-	{
-		char extension[ 32 ];
-		Q_ExtractFileExtension( relative, extension, sizeof( extension ) );
-		char basename[ 256 ];
-		Q_FileBase( relative, basename, sizeof( basename ) );
-		char outname[ 512 ];
-		Q_snprintf( outname, sizeof( outname ), "%s.%s", basename, extension );
-
-		ZipAdd( m_hZip, outname, fullpath, 0, ZIP_FILENAME );
-
-		return true;
-	}
-
 	return false;
 }
 
@@ -2102,36 +2063,6 @@ void CBugUIPanel::OnSubmit()
 			Q_snprintf( fn, sizeof( fn ), "screenshots/%s.jpg", m_szScreenShotName );
 			Q_FixSlashes( fn );
 			attachedScreenshot = AddFileToZip( fn );
-		}
-
-		// End users can only send save games and screenshots to valve
-		// Don't bother uploading any attachment if it's just the info.txt file, either...
-		if ( m_hZip && ( attachedSave || attachedScreenshot ) )
-		{
-			Assert( m_hZip );
-			void *mem;
-			unsigned long len;
-
-			ZipGetMemory( m_hZip, &mem, &len );
-			if ( mem != NULL 
-				 && len > 0 )
-			{
-				// Store .zip file
-				FileHandle_t fh = g_pFileSystem->Open( "bug.zip", "wb" );
-				if ( FILESYSTEM_INVALID_HANDLE != fh )
-				{
-					g_pFileSystem->Write( mem, len, fh );
-					g_pFileSystem->Close( fh );
-
-					m_pBugReporter->SetZipAttachmentName( "bug.zip" );
-				}
-			}
-		}
-
-		if ( m_hZip )
-		{
-			CloseZip( m_hZip );
-			m_hZip = (HZIP)0;
 		}
 
 		uint64 un64SteamID = m_SteamID.ConvertToUint64();

@@ -51,11 +51,11 @@
 #pragma comment( lib, "../../dx9sdk/lib/d3d9.lib" )
 #pragma comment( lib, "../../dx9sdk/lib/d3dx9.lib" )
 
-#elif defined (DXVK) && defined (COMPILER_GCC) && defined (PLATFORM_64BITS)
+#elif defined (DXVK) && defined (GNUC) && defined (PLATFORM_64BITS)
 
 #embed "../../dxvknative/lib/libdxvk_d3d9.so"
 
-#elif defined (DXVK) && defined (COMPILER_GCC) && !defined (PLATFORM_64BITS)
+#elif defined (DXVK) && defined (GNUC) && !defined (PLATFORM_64BITS)
 
 #embed "../../dxvknative/lib32/libdxvk_d3d9.so"
 
