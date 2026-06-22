@@ -222,7 +222,7 @@ def define_platform(conf):
 	conf.env.UTILS = conf.options.UTILS
 	conf.env.TOGLES = conf.options.TOGLES
 	conf.env.GL = conf.options.GL and not conf.options.TESTS and not conf.options.DEDICATED and not conf.options.DXVK
-	conf.env.DXVK =conf.options.DXVK and not conf.options.TESTS and not conf.options.DEDICATED and not conf.options.TESTS
+	conf.env.DXVK = conf.options.DXVK and not conf.options.TESTS and not conf.options.DEDICATED and not conf.options.TESTS
 	conf.env.OPUS = conf.options.OPUS
 
 	arch32 = conf.run_test(CPP_32BIT_CHECK, 'Testing 32bit support')
