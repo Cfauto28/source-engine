@@ -247,9 +247,6 @@ def define_platform(conf):
 	if conf.options.TOGLES:
 		conf.env.append_unique('DEFINES', ['TOGLES'])
 
-	if conf.options.TESTS:
-		conf.define('UNITTESTS', 1)
-
 	if conf.options.SDL and not conf.options.TESTS:
 		conf.env.SDL = 1
 		conf.define('USE_SDL', 1)

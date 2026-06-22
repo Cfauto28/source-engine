@@ -14,7 +14,6 @@ def options(opt):
 def configure(conf):
 	conf.define('SERVERBROWSER_EXPORTS',1)
 	conf.define('VERSION_SAFE_STEAM_API_INTERFACES',1)
-	conf.define('SERVERBROWSER_EXPORTS',1)
 	conf.define('GAME_SRC',1)
 #	conf.define('_USE_32BIT_TIME_T',1)
 
